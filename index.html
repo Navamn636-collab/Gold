@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="apple-mobile-web-app-title" content="NvaMoein">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>حساب واریزی‌ها به گرم طلای آبشده</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&family=Great+Vibes&display=swap">
+<style>
+:root{--bg:#faf8f3;--card:#fff;--tx:#2a2418;--mu:#7a705c;--ac:#b8860b;--bd:#e6dfcf;--hl:#fff6dc;--rd:#b3261e;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1812;--card:#26221a;--tx:#f1ead8;--mu:#a89d84;--ac:#e0b34a;--bd:#3a3427;--hl:#3a3118;--rd:#ff8a80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1b1812;--card:#26221a;--tx:#f1ead8;--mu:#a89d84;--ac:#e0b34a;--bd:#3a3427;--hl:#3a3118;--rd:#ff8a80;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.7 Vazirmatn,Tahoma,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:16px}
+h1{font-size:20px;margin:4px 0 12px}h2{font-size:16px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:14px}
+textarea,input,select{font:inherit;color:var(--tx);background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:6px 8px}
+textarea{width:100%;min-height:130px;resize:vertical}
+button{font:inherit;background:var(--ac);color:#fff;border:0;border-radius:8px;padding:7px 16px;cursor:pointer}
+button.g{background:transparent;color:var(--rd);border:1px solid var(--bd);padding:3px 10px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.mu,small{color:var(--mu)}small{display:block;font-size:11px}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--bd);padding:6px 8px;text-align:center;white-space:nowrap}
+th{background:var(--hl);font-weight:600}
+td.t,th.t{font-weight:700}
+tr.tot td{background:var(--hl);font-weight:700}
+td input{width:120px;text-align:center}td input.d{width:100px}td select{width:80px}
+.sel{position:sticky;bottom:8px;background:var(--hl);border:1px solid var(--ac);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.big{font-size:18px;font-weight:700;color:var(--ac)}
+#msg{margin-top:8px;font-size:13px;color:var(--ac)}
+</style>
+</head>
+<body>
+<main>
+<div class="row" style="justify-content:space-between;margin-bottom:8px"><div class="row"><img id="logo" width="40" height="40" alt="" style="border-radius:10px;border:1px solid var(--bd)"><b style="font-family:'Great Vibes',cursive;font-size:28px;color:var(--ac);font-weight:400">NvaMoein</b></div><button class="g" id="gear" style="color:var(--tx)">⚙ تنظیمات</button></div>
+<div class="card" id="set" hidden><h2>تنظیمات</h2>
+<div class="row" style="margin-bottom:10px"><span>حالت نمایش:</span><select id="mode"><option value="auto">خودکار (مثل گوشی)</option><option value="light">روشن</option><option value="dark">تیره</option></select></div>
+<div class="row"><span>رنگ اپ:</span><span id="sws" class="row"></span></div></div>
+<h1>حساب واریزی‌ها به گرم طلای آبشده</h1>
+
+<div class="card">
+  <div class="row" style="margin-bottom:10px">
+    <label>نرخ پیش‌فرض هر گرم آبشده (تومان):</label>
+    <input id="def" inputmode="numeric" placeholder="مثلاً 5,200,000">
+    <span class="mu">برای هر روز می‌توانید در جدول روزانه نرخ جدا بزنید.</span>
+  </div>
+  <textarea id="inp" placeholder="همه پیامک‌ها را یکجا کپی و اینجا بچسبانید. نیازی به جدا کردن پیام‌ها یا نوشتن اسم بانک نیست."></textarea>
+  <div class="row" style="margin-top:8px"><button id="add">افزودن پیام‌ها</button><span id="msg"></span></div>
+</div>
+
+<div class="card">
+  <h2>پیام‌های ثبت‌شده</h2>
+  <div class="wrap" id="list"></div>
+</div>
+<div class="sel" id="selbar" hidden></div>
+
+<div class="card"><h2>گزارش روزانه (بر اساس تاریخ ثبت)</h2><div class="wrap" id="daily"></div></div>
+<div class="card"><h2>گزارش هفتگی (شنبه تا جمعه)</h2><div class="wrap" id="weekly"></div></div>
+<p class="mu">قانون تاریخ ثبت: بانک‌های دارای کارتخوان (مهر، ملی، رسالت) اگر پیام بین ۰۴:۰۰ تا ۰۸:۰۰ بیاید همان روز، وگرنه روز قبل ثبت می‌شوند. پیام‌های روز جمعه برای پنج‌شنبه ثبت می‌شوند. تاریخ ثبت در جدول قابل ویرایش است. بانک هر پیام از روی قالب پیام و شماره حساب تشخیص داده می‌شود؛ اگر بانکی را نشناخت، یک بار در جدول انتخابش کنید تا شماره حساب آن را یاد بگیرد.</p>
+</main>
+
+<script>
+const BANKS=['ملت','رسالت','مهر','بلو','ملی'],POS=new Set(['مهر','ملی','رسالت']);
+const DAYS=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنج‌شنبه','جمعه','شنبه'];
+const $=s=>document.querySelector(s),pad=x=>String(x).padStart(2,'0');
+const fa=(x,d=0)=>Number(x).toLocaleString('fa-IR',{maximumFractionDigits:d,minimumFractionDigits:d});
+const norm=s=>String(s).replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776).replace(/[٠-٩]/g,c=>c.charCodeAt(0)-1632).replace(/[٬،]/g,',').replace(/ك/g,'ک').replace(/ي/g,'ی').replace(/[\u200c\u200e\u200f\u202a-\u202e]/g,'');
+const num=s=>+(norm(s).replace(/[^\d.]/g,''))||0;
+
+/* Jalali via Intl */
+const fmt=new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{timeZone:'UTC',year:'numeric',month:'numeric',day:'numeric'});
+function g2j(n){const o={};fmt.formatToParts(new Date(n*864e5)).forEach(x=>o[x.type]=+x.value);return[o.year||o.relatedYear,o.month,o.day]}
+function j2g(y,m,d){const t=y*10000+m*100+d;let n=Date.UTC(y+621,2,19)/864e5+(m<=6?(m-1)*31:186+(m-7)*30)+d-1;
+ for(let i=0;i<6;i++){const[a,b,c]=g2j(n),k=a*10000+b*100+c;if(k===t)break;n+=k<t?1:-1}return n}
+const dow=n=>(n+4)%7,jstr=n=>{const[y,m,d]=g2j(n);return y+'/'+pad(m)+'/'+pad(d)};
+const today=()=>{const d=new Date();return Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5};
+function parseJ(s){const m=norm(s).match(/(\d{4})[\/.\-](\d{1,2})[\/.\-](\d{1,2})/);return m?j2g(+m[1],+m[2],+m[3]):null}
+
+/* Rules */
+function reg(bank,mN,time){const[h,mi]=time.split(':').map(Number),mins=h*60+mi;let n=mN;
+ if(dow(n)===5)return n-1;
+ if(POS.has(bank)&&!(mins>=240&&mins<480))n--;
+ if(dow(n)===5)n--;return n}
+
+/* Bank detection: learned account > message format > bank name */
+const DOT=/(?<![\d,.])\d{1,3}\.\d{5,9}\.\d{1,2}(?![\d,])/;
+const accTok=t=>{const m=t.match(DOT)||t.match(/حساب\s*:?\s*(\d{4,14})/)||t.match(/(?<![\d,.\/:\-])(\d{8,14})(?![\d,.\/:\-])/);return m?(m[1]||m[0]):''};
+const sigBank=t=>/واریز پول|ریال\s*به\s*حساب|نشست/.test(t)?'بلو':/انتقالی\s*:/.test(t)?'ملی':DOT.test(t)||/\d{2}\/\d{2}_\d{1,2}:\d{2}/.test(t)?'رسالت':/(?<![\d,.\/])300\d{6,12}(?![\d,])|1\d{3}\/\d{1,2}\/\d{1,2}-\d{1,2}:\d{2}/.test(t)?'مهر':/حساب\s*\d{10}(?!\d)/.test(t)?'ملت':'';
+const nameBank=t=>/رسالت/.test(t)?'رسالت':/ملت/.test(t)?'ملت':/مهر/.test(t)?'مهر':/بلو/.test(t)?'بلو':/ملی/.test(t)?'ملی':'';
+
+/* Split a pasted block into separate messages (a message ends once it has balance + date + time) */
+function split(text){const L=norm(text).split('\n').map(x=>x.trim()).filter(x=>x&&!/^[-=_*]{3,}$/.test(x)),out=[];let cur=[],f={};
+ const D=x=>/14\d\d[\/.\-]\d{1,2}[\/.\-]\d{1,2}|(?<!\d)\d{2}\/\d{2}\/\d{2}(?!\d)|\d{2}\/\d{2}[_\s\-]|\b\d{4}-\d{1,2}:/.test(x);
+ const flush=()=>{if(cur.length)out.push(cur.join('\n'));cur=[];f={}};
+ L.forEach(l=>{if(f.d&&f.t&&/^(بانک|بلو$)/.test(l))flush();
+  cur.push(l);if(/مانده|موجودی/.test(l))f.b=1;if(D(l))f.d=1;if(/\d{1,2}:\d{2}/.test(l))f.t=1;
+  if(f.b&&f.d&&f.t)flush()});flush();return out}
+
+/* Parse one bank SMS */
+function parse(c){const t=norm(c);
+ const acc=accTok(t),bank=(acc&&S.acc[acc])||sigBank(t)||nameBank(t);
+ const m=t.match(/\+[ \t]*([\d,]{4,})/)||t.match(/([\d,]{4,})[ \t]*\+/)||t.match(/([\d,]{4,})\s*ریال\s*به\s*حساب/)||t.match(/(?:واریز|انتقالی|مبلغ)[^\d\n]{0,20}([\d,]{4,})/);
+ if(!m)return null;const rial=+m[1].replace(/,/g,'');if(!rial)return null;
+ const tm=t.match(/(\d{1,2}):(\d{2})/),nowd=new Date();
+ const time=tm?pad(tm[1])+':'+tm[2]:pad(nowd.getHours())+':'+pad(nowd.getMinutes());
+ const cy=g2j(today())[0];let d,mN=null;
+ if(d=t.match(/(14\d\d)[\/.\-](\d{1,2})[\/.\-](\d{1,2})/))mN=j2g(+d[1],+d[2],+d[3]);
+ else if(d=t.match(/(?<!\d)(\d{2})\/(\d{2})\/(\d{2})(?!\d)/))mN=j2g(1400+ +d[1],+d[2],+d[3]);
+ else if(d=t.match(/(\d{2})\/(\d{2})[_\s\-]/))mN=j2g(cy,+d[1],+d[2]);
+ else if(d=t.match(/\b(\d{2})(\d{2})-\d{1,2}:/))mN=j2g(cy,+d[1],+d[2]);
+ if(mN==null)mN=today();
+ return{bank,acc,rial,mN,time}}
+
+/* State */
+let S={def:0,prices:{},items:[],seq:0};const sel=new Set();
+try{const x=JSON.parse(localStorage.getItem('gold-v1')||'null');if(x)S=x}catch(e){}
+if(!S.acc)S.acc={};S.items.forEach(x=>{const b=DOT.test(x.acc||'')?'رسالت':/^300\d+$/.test(x.acc||'')?'مهر':x.bank;if(b!==x.bank){x.bank=b;x.regN=reg(b,x.mN,x.time)}});const save=()=>{try{localStorage.setItem('gold-v1',JSON.stringify(S))}catch(e){}};
+const price=n=>S.prices[n]||S.def||0;
+const gr=it=>{const p=price(it.regN);return p>0?it.rial/10/p:null};
+
+function add(text){let a=0,s=0,u=0;
+ split(text).forEach(c=>{const p=parse(c);
+  if(!p||S.items.some(x=>x.bank===p.bank&&x.rial===p.rial&&x.mN===p.mN&&x.time===p.time)){s++;return}
+  S.items.push({id:++S.seq,...p,regN:reg(p.bank,p.mN,p.time)});a++;if(!p.bank)u++});
+ save();$('#msg').textContent=fa(a)+' پیام تشخیص داده شد'+(u?' ('+fa(u)+' مورد بانکش مشخص نشد؛ در جدول انتخاب کنید تا یاد بگیرم)':'')+(s?'، '+fa(s)+' مورد رد شد (برداشت، نامعتبر یا تکراری)':'');render()}
+
+/* Render */
+function render(){
+ $('#def').value=S.def?fa(S.def).replace(/٬/g,','):'';
+ const its=[...S.items].sort((a,b)=>b.regN-a.regN||b.id-a.id);
+ $('#list').innerHTML=its.length?`<table><tr><th><input type="checkbox" id="all"></th><th>تاریخ ثبت</th><th>پیام (تاریخ/ساعت)</th><th>بانک</th><th>مبلغ (ریال)</th><th>گرم</th><th></th></tr>`+
+ its.map(it=>{const g=gr(it);return`<tr data-id="${it.id}"><td><input type="checkbox" class="ck" ${sel.has(it.id)?'checked':''}></td>
+ <td><input class="d" data-f="date" value="${jstr(it.regN)}"><small>${DAYS[dow(it.regN)]}</small></td>
+ <td>${jstr(it.mN)}<small>${it.time} - ${DAYS[dow(it.mN)]}</small></td>
+ <td><select data-f="bank">${['',...BANKS].map(b=>`<option value="${b}" ${b===it.bank?'selected':''}>${b||'نامشخص'}</option>`).join('')}</select></td>
+ <td><input data-f="rial" inputmode="numeric" value="${it.rial.toLocaleString('en')}"></td>
+ <td class="t">${g==null?'—':fa(g,2)}</td><td><button class="g" data-del="1">حذف</button></td></tr>`}).join('')+'</table>':'<p class="mu">هنوز پیامی اضافه نشده.</p>';
+ $('#daily').innerHTML=tbl(grp(n=>n),n=>`${jstr(n)}<small>${DAYS[dow(n)]}</small>`,true);
+ $('#weekly').innerHTML=tbl(grp(n=>n-(n+5)%7),n=>`${jstr(n)} تا ${jstr(n+6)}`,false);
+ selbar()}
+function grp(kf){const m={};S.items.forEach(it=>{const k=kf(it.regN),o=m[k]||(m[k]={by:{},r:0,g:0,miss:0}),b=o.by[it.bank]||(o.by[it.bank]={r:0,g:0}),g=gr(it);
+ b.r+=it.rial;o.r+=it.rial;if(g==null)o.miss=1;else{b.g+=g;o.g+=g}});return m}
+const cell=o=>o&&o.r?`${fa(o.r)}<small>${o.g?fa(o.g,2)+' گرم':''}</small>`:'<span class="mu">—</span>';
+function tbl(m,lab,daily){const ks=Object.keys(m).map(Number).sort((a,b)=>b-a);if(!ks.length)return'<p class="mu">داده‌ای نیست.</p>';
+ const bs=['ملت','رسالت','مهر','بلو','ملی',''].filter(b=>S.items.some(i=>i.bank===b));
+ const T={by:{},r:0,g:0,miss:0};
+ let h=`<table><tr><th>${daily?'تاریخ':'هفته'}</th>${daily?'<th>نرخ هر گرم (تومان)</th>':''}${bs.map(b=>`<th>${b||'نامشخص'}</th>`).join('')}<th class="t">جمع (ریال)</th><th class="t">جمع (گرم)</th></tr>`;
+ ks.forEach(k=>{const o=m[k];T.r+=o.r;T.g+=o.g;T.miss|=o.miss;bs.forEach(b=>{if(o.by[b]){const x=T.by[b]||(T.by[b]={r:0,g:0});x.r+=o.by[b].r;x.g+=o.by[b].g}});
+  h+=`<tr><td>${lab(k)}</td>${daily?`<td><input data-p="${k}" inputmode="numeric" placeholder="${S.def?S.def.toLocaleString('en'):'نرخ'}" value="${S.prices[k]?S.prices[k].toLocaleString('en'):''}"></td>`:''}${bs.map(b=>`<td>${cell(o.by[b])}</td>`).join('')}<td class="t">${fa(o.r)}</td><td class="t">${o.miss?'نرخ نیست':fa(o.g,2)}</td></tr>`});
+ return h+`<tr class="tot"><td>جمع کل</td>${daily?'<td></td>':''}${bs.map(b=>`<td>${cell(T.by[b])}</td>`).join('')}<td>${fa(T.r)}</td><td>${fa(T.g,2)}${T.miss?'*':''}</td></tr></table>`}
+function selbar(){const b=$('#selbar');if(!sel.size){b.hidden=true;return}
+ let r=0,g=0,miss=0;S.items.forEach(it=>{if(sel.has(it.id)){r+=it.rial;const x=gr(it);if(x==null)miss=1;else g+=x}});
+ b.hidden=false;b.innerHTML=`<div class="row"><span>${fa(sel.size)} پیام انتخاب شده</span><span>جمع: ${fa(r)} ریال (${fa(r/10)} تومان)</span><span class="big">${fa(g,2)} گرم طلا</span>${miss?'<span class="mu">برای برخی روزها نرخ تعیین نشده</span>':''}<button class="g" id="delsel">حذف انتخاب‌شده‌ها</button></div>`}
+
+/* Events */
+$('#add').onclick=()=>{add($('#inp').value);$('#inp').value=''};
+document.addEventListener('change',e=>{const t=e.target,tr=t.closest('tr'),id=tr&&+tr.dataset.id,it=S.items.find(x=>x.id===id);
+ if(t.id==='def'){S.def=num(t.value);save();render()}
+ else if(t.dataset.p){const v=num(t.value);if(v)S.prices[t.dataset.p]=v;else delete S.prices[t.dataset.p];save();render()}
+ else if(t.id==='all'){sel.clear();if(t.checked)S.items.forEach(x=>sel.add(x.id));render()}
+ else if(t.classList.contains('ck')){t.checked?sel.add(id):sel.delete(id);render()}
+ else if(it&&t.dataset.f){const f=t.dataset.f;
+  if(f==='bank'){it.bank=t.value;it.regN=reg(it.bank,it.mN,it.time);if(it.acc&&t.value){S.acc[it.acc]=t.value;S.items.forEach(x=>{if(x.acc===it.acc&&!x.bank){x.bank=t.value;x.regN=reg(x.bank,x.mN,x.time)}})}}
+  else if(f==='rial')it.rial=num(t.value);
+  else if(f==='date'){const n=parseJ(t.value);if(n!=null)it.regN=n}
+  save();render()}});
+document.addEventListener('click',e=>{const t=e.target;
+ if(t.dataset.del){const id=+t.closest('tr').dataset.id;S.items=S.items.filter(x=>x.id!==id);sel.delete(id);save();render()}
+ if(t.id==='delsel'){S.items=S.items.filter(x=>!sel.has(x.id));sel.clear();save();render()}});
+/* Theme settings */
+const PAL={gold:['#b8860b','#e0b34a','طلایی'],blue:['#1f6feb','#6ea8ff','آبی'],green:['#1a7f4b','#4cc38a','سبز'],rose:['#c2255c','#ff7aa8','صورتی'],purple:['#7048e8','#a78bfa','بنفش']};
+let T={mode:'auto',pal:'gold'};
+try{Object.assign(T,JSON.parse(localStorage.getItem('gold-theme')||'{}'))}catch(e){}
+const mq=matchMedia('(prefers-color-scheme:dark)');
+function theme(){const r=document.documentElement;if(T.mode==='auto')r.removeAttribute('data-theme');else r.dataset.theme=T.mode;
+ const dark=T.mode==='dark'||(T.mode==='auto'&&mq.matches),p=PAL[T.pal]||PAL.gold;r.style.setProperty('--ac',dark?p[1]:p[0]);
+ $('#mode').value=T.mode;
+ $('#sws').innerHTML=Object.keys(PAL).map(k=>`<button class="g" data-pal="${k}" style="color:var(--tx);${k===T.pal?'border:2px solid var(--ac)':''}"><span style="display:inline-block;width:14px;height:14px;border-radius:50%;background:${PAL[k][0]};vertical-align:middle"></span> ${PAL[k][2]}</button>`).join('');
+ try{localStorage.setItem('gold-theme',JSON.stringify(T))}catch(e){}}
+if(mq.addEventListener)mq.addEventListener('change',theme);
+$('#gear').onclick=()=>{$('#set').hidden=!$('#set').hidden};
+$('#mode').onchange=e=>{T.mode=e.target.value;theme()};
+$('#sws').onclick=e=>{const b=e.target.closest('[data-pal]');if(b){T.pal=b.dataset.pal;theme()}};
+theme();
+
+/* App icon: white background, golden connected script text */
+async function icon(){try{await document.fonts.load('200px "Great Vibes"','NvaMoein')}catch(e){}
+ const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d');
+ x.fillStyle='#fff';x.fillRect(0,0,512,512);
+ let s=200;x.font=s+'px "Great Vibes",cursive';
+ while(x.measureText('NvaMoein').width>430&&s>20){s-=6;x.font=s+'px "Great Vibes",cursive'}
+ const g=x.createLinearGradient(0,150,0,370);g.addColorStop(0,'#e6c35c');g.addColorStop(.5,'#b8860b');g.addColorStop(1,'#8a6508');
+ x.fillStyle=g;x.textAlign='center';x.textBaseline='middle';x.fillText('NvaMoein',256,270);
+ const u=c.toDataURL('image/png');$('#logo').src=u;
+ ['apple-touch-icon','icon'].forEach(r=>{let l=document.querySelector('link[rel="'+r+'"]');if(!l){l=document.createElement('link');l.rel=r;document.head.appendChild(l)}l.href=u})}
+icon();
+render();
+</script>
+</body>
+</html>
